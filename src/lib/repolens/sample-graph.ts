@@ -1,32 +1,55 @@
 import type { Edge, Node } from "@xyflow/react";
 
-export const sampleNodes: Node[] = [
+export type RepoNodeData = {
+  label: string;
+  path: string;
+  kind: "page" | "component" | "library";
+  summary: string;
+  dependencies: string[];
+};
+
+export type RepoNode = Node<RepoNodeData>;
+export type RepoEdge = Edge;
+
+export const sampleNodes: RepoNode[] = [
   {
-    id: "app",
+    id: "page",
     type: "input",
-    position: { x: 80, y: 120 },
-    data: { label: "src/app/page.tsx" },
+    position: { x: 80, y: 140 },
+    data: {
+      label: "page.tsx",
+      path: "src/app/page.tsx",
+      kind: "page",
+      summary: "Entry page that renders the RepoLens explorer.",
+      dependencies: ["components/repo-explorer.tsx"],
+    },
+  },
+  {
+    id: "explorer",
+    position: { x: 380, y: 120 },
+    data: {
+      label: "repo-explorer.tsx",
+      path: "src/components/repo-explorer.tsx",
+      kind: "component",
+      summary: "Controls the selected file state and page layout.",
+      dependencies: ["components/repo-graph.tsx", "lib/repolens/sample-graph.ts"],
+    },
   },
   {
     id: "graph",
-    position: { x: 380, y: 80 },
-    data: { label: "components/repo-graph.tsx" },
-  },
-  {
-    id: "auth",
-    position: { x: 380, y: 240 },
-    data: { label: "lib/auth.ts" },
-  },
-  {
-    id: "db",
     type: "output",
-    position: { x: 700, y: 240 },
-    data: { label: "lib/db.ts" },
+    position: { x: 720, y: 120 },
+    data: {
+      label: "repo-graph.tsx",
+      path: "src/components/repo-graph.tsx",
+      kind: "component",
+      summary: "Displays the interactive dependency graph.",
+      dependencies: ["@xyflow/react", "lib/repolens/sample-graph.ts"],
+    },
   },
 ];
 
-export const sampleEdges: Edge[] = [
-  { id: "app-graph", source: "app", target: "graph", label: "renders" },
-  { id: "app-auth", source: "app", target: "auth", label: "imports" },
-  { id: "auth-db", source: "auth", target: "db", label: "queries" },
+export const sampleEdges: RepoEdge[] = [
+  { id: "page-explorer", source: "page", target: "explorer", label: "renders" },
+  { id: "explorer-graph", source: "explorer", target: "graph", label: "renders" },
 ];
