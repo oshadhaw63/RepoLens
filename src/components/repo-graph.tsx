@@ -3,15 +3,22 @@
 import { Background, Controls, MiniMap, ReactFlow } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
-import { sampleEdges, sampleNodes, type RepoNode } from "@/lib/repolens/sample-graph";
+import type { RepoEdge, RepoNode } from "@/lib/repolens/sample-graph";
 
 type RepoGraphProps = {
+  nodes: RepoNode[];
+  edges: RepoEdge[];
   selectedNodeId: string;
   onNodeSelect: (node: RepoNode) => void;
 };
 
-export function RepoGraph({ selectedNodeId, onNodeSelect }: RepoGraphProps) {
-  const visibleNodes = sampleNodes.map((node) => ({
+export function RepoGraph({
+  nodes,
+  edges,
+  selectedNodeId,
+  onNodeSelect,
+}: RepoGraphProps) {
+  const visibleNodes = nodes.map((node) => ({
     ...node,
     selected: node.id === selectedNodeId,
   }));
@@ -19,7 +26,7 @@ export function RepoGraph({ selectedNodeId, onNodeSelect }: RepoGraphProps) {
   return (
     <ReactFlow
       nodes={visibleNodes}
-      edges={sampleEdges}
+      edges={edges}
       fitView
       onNodeClick={(_, node) => onNodeSelect(node as RepoNode)}
     >
