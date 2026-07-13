@@ -1,61 +1,6 @@
-"use client";
-
-import {
-  Background,
-  Controls,
-  MiniMap,
-  ReactFlow,
-  type Edge,
-  type Node,
-} from "@xyflow/react";
-import "@xyflow/react/dist/style.css";
 import { GitBranch, Search } from "lucide-react";
 
-const nodes: Node[] = [
-  {
-    id: "app",
-    type: "input",
-    position: { x: 80, y: 120 },
-    data: { label: "src/app/page.tsx" },
-  },
-  {
-    id: "graph",
-    position: { x: 380, y: 80 },
-    data: { label: "components/repo-graph.tsx" },
-  },
-  {
-    id: "auth",
-    position: { x: 380, y: 240 },
-    data: { label: "lib/auth.ts" },
-  },
-  {
-    id: "db",
-    type: "output",
-    position: { x: 700, y: 240 },
-    data: { label: "lib/db.ts" },
-  },
-];
-
-const edges: Edge[] = [
-  {
-    id: "app-graph",
-    source: "app",
-    target: "graph",
-    label: "renders",
-  },
-  {
-    id: "app-auth",
-    source: "app",
-    target: "auth",
-    label: "imports",
-  },
-  {
-    id: "auth-db",
-    source: "auth",
-    target: "db",
-    label: "queries",
-  },
-];
+import { RepoGraph } from "@/components/repo-graph";
 
 export default function Home() {
   return (
@@ -79,11 +24,7 @@ export default function Home() {
 
       <section className="mx-auto grid max-w-7xl grid-cols-[1fr_320px] gap-6 px-6 py-6">
         <div className="h-[620px] overflow-hidden rounded-lg border border-stone-300 bg-white">
-          <ReactFlow nodes={nodes} edges={edges} fitView>
-            <Background />
-            <Controls />
-            <MiniMap />
-          </ReactFlow>
+          <RepoGraph />
         </div>
 
         <aside className="rounded-lg border border-stone-300 bg-white p-5">
@@ -93,15 +34,6 @@ export default function Home() {
             Main application screen. It renders the RepoLens interface and
             connects the graph view to the rest of the app.
           </p>
-
-          <div className="mt-6 border-t border-stone-200 pt-4">
-            <p className="text-sm font-medium">Dependencies</p>
-            <ul className="mt-3 space-y-2 text-sm text-stone-700">
-              <li>@xyflow/react</li>
-              <li>lucide-react</li>
-              <li>lib/auth.ts</li>
-            </ul>
-          </div>
         </aside>
       </section>
     </main>
