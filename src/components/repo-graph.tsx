@@ -3,7 +3,7 @@
 import { Background, Controls, MiniMap, ReactFlow } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
-import type { RepoEdge, RepoNode } from "@/lib/repolens/sample-graph";
+import type { RepoEdge, RepoNode } from "@/lib/repolens/graph-types";
 
 type RepoGraphProps = {
   nodes: RepoNode[];

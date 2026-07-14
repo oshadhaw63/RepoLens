@@ -1,15 +1,14 @@
 "use client";
 
+"use client";
+
 import { useMemo, useState } from "react";
 import { GitBranch, Search } from "lucide-react";
 
+import { FileDetailsPanel } from "@/components/file-details-panel";
 import { RepoGraph } from "@/components/repo-graph";
-import {
-  sampleEdges,
-  sampleNodes,
-  type RepoEdge,
-  type RepoNode,
-} from "@/lib/repolens/sample-graph";
+import { sampleEdges, sampleNodes } from "@/lib/repolens/sample-graph";
+import type { RepoEdge, RepoNode } from "@/lib/repolens/graph-types";
 
 export function RepoExplorer() {
   const [selectedNode, setSelectedNode] = useState<RepoNode>(sampleNodes[0]);
@@ -76,23 +75,7 @@ export function RepoExplorer() {
           />
         </div>
 
-        <aside className="rounded-lg border border-stone-300 bg-white p-5">
-          <p className="text-sm font-medium text-stone-500">{selectedFile.kind}</p>
-          <h2 className="mt-2 text-lg font-semibold">{selectedFile.label}</h2>
-          <p className="mt-1 text-sm text-stone-500">{selectedFile.path}</p>
-          <p className="mt-4 text-sm leading-6 text-stone-700">
-            {selectedFile.summary}
-          </p>
-
-          <div className="mt-6 border-t border-stone-200 pt-4">
-            <p className="text-sm font-medium">Dependencies</p>
-            <ul className="mt-3 space-y-2 text-sm text-stone-700">
-              {selectedFile.dependencies.map((dependency) => (
-                <li key={dependency}>{dependency}</li>
-              ))}
-            </ul>
-          </div>
-        </aside>
+        <FileDetailsPanel file={selectedFile} />
       </section>
     </main>
   );

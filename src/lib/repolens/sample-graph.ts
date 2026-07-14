@@ -1,15 +1,4 @@
-import type { Edge, Node } from "@xyflow/react";
-
-export type RepoNodeData = {
-  label: string;
-  path: string;
-  kind: "page" | "component" | "library";
-  summary: string;
-  dependencies: string[];
-};
-
-export type RepoNode = Node<RepoNodeData>;
-export type RepoEdge = Edge;
+import type { RepoEdge, RepoNode } from "@/lib/repolens/graph-types";
 
 export const sampleNodes: RepoNode[] = [
   {
