@@ -11,6 +11,13 @@ export const sampleNodes: RepoNode[] = [
       kind: "page",
       summary: "Entry page that renders the RepoLens explorer.",
       dependencies: ["components/repo-explorer.tsx"],
+      imports: ["RepoExplorer from @/components/repo-explorer"],
+      exports: ["default Home"],
+      functions: ["Home"],
+      risk: {
+        level: "low",
+        reason: "Small entry file with one responsibility: render the explorer.",
+      },
     },
   },
   {
@@ -21,7 +28,25 @@ export const sampleNodes: RepoNode[] = [
       path: "src/components/repo-explorer.tsx",
       kind: "component",
       summary: "Controls the selected file state and page layout.",
-      dependencies: ["components/repo-graph.tsx", "lib/repolens/sample-graph.ts"],
+      dependencies: [
+        "components/repo-graph.tsx",
+        "components/file-details-panel.tsx",
+        "lib/repolens/sample-graph.ts",
+      ],
+      imports: [
+        "useMemo and useState from react",
+        "GitBranch and Search from lucide-react",
+        "RepoGraph",
+        "FileDetailsPanel",
+        "sample graph data",
+      ],
+      exports: ["RepoExplorer"],
+      functions: ["RepoExplorer", "filteredNodes search calculation"],
+      risk: {
+        level: "medium",
+        reason:
+          "Owns search state, selected file state, filtering, and layout coordination.",
+      },
     },
   },
   {
@@ -33,7 +58,15 @@ export const sampleNodes: RepoNode[] = [
       path: "src/components/repo-graph.tsx",
       kind: "component",
       summary: "Displays the interactive dependency graph.",
-      dependencies: ["@xyflow/react", "lib/repolens/sample-graph.ts"],
+      dependencies: ["@xyflow/react", "lib/repolens/graph-types.ts"],
+      imports: ["React Flow components", "React Flow styles", "Repo graph types"],
+      exports: ["RepoGraph"],
+      functions: ["RepoGraph"],
+      risk: {
+        level: "medium",
+        reason:
+          "Depends on browser-only graph interactions, so it must stay a client component.",
+      },
     },
   },
 ];

@@ -27,11 +27,15 @@ export function RepoExplorer() {
         node.data.path,
         node.data.kind,
         node.data.summary,
+        node.data.risk.level,
+        node.data.risk.reason,
         ...node.data.dependencies,
+        ...node.data.imports,
+        ...node.data.exports,
+        ...node.data.functions,
       ]
-        .join(" ")
-        .toLowerCase();
-
+      .join(" ")
+      .toLowerCase();
       return searchableText.includes(query);
     });
   }, [searchQuery]);
