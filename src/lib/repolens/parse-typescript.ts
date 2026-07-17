@@ -37,7 +37,9 @@ export function parseTypeScriptFile(
     if (ts.isFunctionDeclaration(node) && node.name) {
       result.functions.push(node.name.text);
 
-      if (hasExportKeyword(node)) {
+      if (hasDefaultKeyword(node)) {
+        result.exports.push(`default ${node.name.text}`);
+      } else if (hasExportKeyword(node)) {
         result.exports.push(node.name.text);
       }
     }
@@ -45,7 +47,9 @@ export function parseTypeScriptFile(
     if (ts.isClassDeclaration(node) && node.name) {
       result.classes.push(node.name.text);
 
-      if (hasExportKeyword(node)) {
+      if (hasDefaultKeyword(node)) {
+        result.exports.push(`default ${node.name.text}`);
+      } else if (hasExportKeyword(node)) {
         result.exports.push(node.name.text);
       }
     }
@@ -85,6 +89,16 @@ export function parseTypeScriptFile(
 function hasExportKeyword(node: ts.Node) {
   return ts.canHaveModifiers(node)
     ? Boolean(node.modifiers?.some((modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword))
+    : false;
+}
+
+function hasDefaultKeyword(node: ts.Node) {
+  return ts.canHaveModifiers(node)
+    ? Boolean(
+        node.modifiers?.some(
+          (modifier) => modifier.kind === ts.SyntaxKind.DefaultKeyword,
+        ),
+      )
     : false;
 }
 
