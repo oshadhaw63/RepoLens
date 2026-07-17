@@ -50,13 +50,25 @@ export function parseTypeScriptFile(
       }
     }
 
-    if (ts.isVariableStatement(node) && hasExportKeyword(node)) {
+    if (ts.isVariableStatement(node)) {
+      const isExported = hasExportKeyword(node);
+
       for (const declaration of node.declarationList.declarations) {
-        if (ts.isIdentifier(declaration.name)) {
-          result.exports.push(declaration.name.text);
+        if (!ts.isIdentifier(declaration.name)) {
+          continue;
+        }
+
+          const name = declaration.name.text;
+
+          if (declaration.initializer && isFunctionLikeInitializer(declaration.initializer)) {
+            result.functions.push(name);
+          }
+
+          if (isExported) {
+            result.exports.push(name);
+          }
         }
       }
-    }
 
     if (ts.isExportAssignment(node)) {
       result.exports.push("default");
@@ -90,4 +102,8 @@ function getScriptKind(filePath: string) {
   }
 
   return ts.ScriptKind.JS;
+}
+
+function isFunctionLikeInitializer(node: ts.Expression) {
+  return ts.isArrowFunction(node) || ts.isFunctionExpression(node);
 }
