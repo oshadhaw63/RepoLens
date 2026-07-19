@@ -6,6 +6,7 @@ import { createOnboardingPath } from "@/lib/repolens/create-onboarding-path";
 import { getExternalDependencies } from "@/lib/repolens/get-external-dependencies"
 import { FileDetailsPanel } from "@/components/file-details-panel";
 import { RepoGraph } from "@/components/repo-graph";
+import { searchRepo } from "@/lib/repolens/search-repo";
 import type {
   RepoEdge,
   RepoGraphData,
@@ -128,6 +129,11 @@ export function RepoExplorer() {
   const externalDependencies = useMemo(() => {
     return getExternalDependencies(graph.nodes);
   }, [graph.nodes]);
+
+  const searchResults = useMemo(() => {
+    return searchRepo(graph.nodes, searchQuery);
+  }, [graph.nodes, searchQuery]);
+
   return (
     <main className="min-h-screen bg-stone-100 text-stone-950">
       <header className="border-b border-stone-300 bg-white">
@@ -175,6 +181,44 @@ export function RepoExplorer() {
         </div>
 
         <div className="space-y-6">
+          {searchQuery.trim() ? (
+            <aside className="rounded-lg border border-stone-300 bg-white p-5">
+              <p className="text-sm font-medium text-stone-500">Search results</p>
+              <h2 className="mt-2 text-lg font-semibold">Best matches</h2>
+
+              {searchResults.length > 0 ? (
+                <ul className="mt-4 space-y-3">
+                  {searchResults.map((result) => (
+                    <li key={result.path}>
+                      <button
+                        type="button"
+                        className="w-full rounded-md border border-stone-200 bg-stone-50 p-3 text-left hover:border-teal-500 hover:bg-teal-50"
+                        onClick={() => {
+                          const matchingNode = graph.nodes.find(
+                            (node) => node.data.path === result.path,
+                          );
+
+                          if (matchingNode) {
+                            setSelectedNode(matchingNode);
+                          }
+                        }}
+                      >
+                        <p className="text-sm font-medium text-stone-800">
+                          {result.label}
+                        </p>
+                        <p className="mt-1 text-xs text-stone-500">{result.path}</p>
+                        <p className="mt-2 text-xs leading-5 text-stone-700">
+                          Matched {result.matches.join(", ")}
+                        </p>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-4 text-sm text-stone-500">No matching files found.</p>
+              )}
+            </aside>
+          ) : null}
           {selectedNode ? (
             <FileDetailsPanel file={selectedNode.data} usedBy={usedBy} />
           ) : (
