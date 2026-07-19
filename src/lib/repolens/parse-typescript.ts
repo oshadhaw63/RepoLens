@@ -82,6 +82,22 @@ export function parseTypeScriptFile(
       result.exports.push("default");
     }
 
+    if (ts.isExportDeclaration(node)) {
+      const moduleName = node.moduleSpecifier
+        ? node.moduleSpecifier.getText(sourceFile).replaceAll('"', "").replaceAll("'", "")
+        : null;
+
+      if (node.exportClause && ts.isNamedExports(node.exportClause)) {
+        for (const element of node.exportClause.elements) {
+          result.exports.push(element.name.text);
+        }
+      }
+
+      if (moduleName) {
+        result.imports.push(`re-export from ${moduleName}`);
+      }
+    }
+
     ts.forEachChild(node, visit);
   }
 
