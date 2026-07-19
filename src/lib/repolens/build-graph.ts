@@ -18,6 +18,34 @@ function getNodeKind(filePath: string): RepoNodeKind {
   return "library";
 }
 
+function createRisk(file: ParsedTypeScriptFile) {
+  const score =
+    file.imports.length +
+    file.functions.length +
+    file.exports.length;
+
+  if (score >= 12) {
+    return {
+      level: "high" as const,
+      reason:
+        "This file has many imports, functions, or exports, so it may be doing too much.",
+    };
+  }
+
+  if (score >= 6) {
+    return {
+      level: "medium" as const,
+      reason:
+        "This file has a moderate amount of responsibility and may be worth reviewing.",
+    };
+  }
+
+  return {
+    level: "low" as const,
+    reason: "This file has a small detected surface area.",
+  };
+}
+
 function getFileLabel(filePath: string) {
   return path.posix.basename(filePath);
 }
