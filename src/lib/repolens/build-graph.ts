@@ -151,3 +151,13 @@ function resolveImportToNodeId(
   ];
   return possibleTargets.find((target) => nodeIds.has(target)) ?? null;
 }
+
+function getModulePath(importSummary: string) {
+  const fromIndex = importSummary.lastIndexOf(" from ");
+
+  if (fromIndex === -1) {
+    return importSummary;
+  }
+
+  return importSummary.slice(fromIndex + " from ".length);
+}
