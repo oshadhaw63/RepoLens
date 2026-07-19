@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { GitBranch, Search } from "lucide-react";
-import {createOnboardingPath} from "@/lib/repolens/create-onboarding-path";
-
+import { createOnboardingPath } from "@/lib/repolens/create-onboarding-path";
+import { getExternalDependencies } from "@/lib/repolens/get-external-dependencies"
 import { FileDetailsPanel } from "@/components/file-details-panel";
 import { RepoGraph } from "@/components/repo-graph";
 import type {
@@ -110,21 +110,24 @@ export function RepoExplorer() {
   }, [filteredNodes, filteredNodeIds, selectedNode]);
 
   const graphStats = useMemo(() => {
-  return {
-    files: graph.nodes.length,
-    dependencies: graph.edges.length,
-    mediumRiskFiles: graph.nodes.filter(
-      (node) => node.data.risk.level === "medium",
-    ).length,
-    highRiskFiles: graph.nodes.filter((node) => node.data.risk.level === "high")
-      .length,
-  };
+    return {
+      files: graph.nodes.length,
+      dependencies: graph.edges.length,
+      mediumRiskFiles: graph.nodes.filter(
+        (node) => node.data.risk.level === "medium",
+      ).length,
+      highRiskFiles: graph.nodes.filter((node) => node.data.risk.level === "high")
+        .length,
+    };
   }, [graph.nodes, graph.edges]);
 
   const onboardingPath = useMemo(() => {
     return createOnboardingPath(graph.nodes);
   }, [graph.nodes]);
 
+  const externalDependencies = useMemo(() => {
+    return getExternalDependencies(graph.nodes);
+  }, [graph.nodes]);
   return (
     <main className="min-h-screen bg-stone-100 text-stone-950">
       <header className="border-b border-stone-300 bg-white">
@@ -201,6 +204,28 @@ export function RepoExplorer() {
                 </li>
               ))}
             </ol>
+          </aside>
+
+          <aside className="rounded-lg border border-stone-300 bg-white p-5">
+            <p className="text-sm font-medium text-stone-500">External dependencies</p>
+            <h2 className="mt-2 text-lg font-semibold">Packages in use</h2>
+
+            {externalDependencies.length > 0 ? (
+              <ul className="mt-4 flex flex-wrap gap-2">
+                {externalDependencies.map((dependency) => (
+                  <li
+                    key={dependency}
+                    className="rounded-md border border-stone-300 bg-stone-50 px-2 py-1 text-xs text-stone-700"
+                  >
+                    {dependency}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-4 text-sm text-stone-500">
+                No external packages detected yet.
+              </p>
+            )}
           </aside>
         </div>
       </section>
