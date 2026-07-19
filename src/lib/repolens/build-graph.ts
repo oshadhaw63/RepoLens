@@ -87,7 +87,7 @@ export function buildGraphFromParsedFiles(files: ParsedTypeScriptFile[]) {
       data: {
         label: folderPath,
         path: folderPath,
-        kind: "library",
+        kind: "folder",
         summary: "Folder containing related source files.",
         dependencies: [],
         imports: [],
@@ -100,8 +100,9 @@ export function buildGraphFromParsedFiles(files: ParsedTypeScriptFile[]) {
       },
     };
   });
-
+  
   const fileNodes: RepoNode[] = files.map((file, index) => {
+    
     return {
       id: file.path,
       position: {
@@ -127,9 +128,19 @@ export function buildGraphFromParsedFiles(files: ParsedTypeScriptFile[]) {
       },
     };
   });
-
+  const nodes = [...folderNodes, ...fileNodes];
   const nodeIds = new Set(nodes.map((node) => node.id));
   const edges: RepoEdge[] = [];
+  for (const file of files) {
+  const folderPath = getFolderPath(file.path);
+
+  edges.push({
+    id: `folder:${folderPath}->${file.path}`,
+    source: `folder:${folderPath}`,
+    target: file.path,
+    label: "contains",
+  });
+}
 
   for (const file of files) {
     for (const importSummary of file.imports) {

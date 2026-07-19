@@ -33,6 +33,7 @@ export function RepoGraph({
   const visibleNodes = nodes.map((node) => {
     const isSelected = node.id === selectedNodeId;
     const isConnected = connectedNodeIds.has(node.id);
+    const isFolder = node.data.kind === "folder";
 
     return {
       ...node,
@@ -42,8 +43,10 @@ export function RepoGraph({
           ? "2px solid #0f766e"
           : isConnected
             ? "2px solid #14b8a6"
-            : "1px solid #d6d3d1",
-        background: isSelected ? "#ccfbf1" : "#ffffff",
+            : isFolder
+              ? "1px solid #f59e0b"
+              : "1px solid #d6d3d1",
+        background: isSelected ? "#ccfbf1" : isFolder ? "#fffbeb" : "#ffffff",
         color: "#1c1917",
       },
     };
