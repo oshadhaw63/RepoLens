@@ -4,11 +4,14 @@ import type { ParsedTypeScriptFile } from "@/lib/repolens/parse-typescript";
 import type { RepoEdge, RepoNode, RepoNodeKind } from "@/lib/repolens/graph-types";
 
 function getNodeKind(filePath: string): RepoNodeKind {
-  if (filePath.includes(`${path.sep}app${path.sep}`)) {
+  if (filePath.startsWith("src/app/") || filePath.includes("/app/")) {
     return "page";
   }
 
-  if (filePath.includes(`${path.sep}components${path.sep}`)) {
+  if (
+    filePath.startsWith("src/components/") ||
+    filePath.includes("/components/")
+  ) {
     return "component";
   }
 
@@ -16,7 +19,7 @@ function getNodeKind(filePath: string): RepoNodeKind {
 }
 
 function getFileLabel(filePath: string) {
-  return path.basename(filePath);
+  return path.posix.basename(filePath);
 }
 
 function createSummary(file: ParsedTypeScriptFile) {
@@ -101,11 +104,11 @@ function resolveImportToNodeId(
     return null;
   }
 
-  const sourceDirectory = path.dirname(sourceFilePath);
+  const sourceDirectory = path.posix.dirname(sourceFilePath);
 
   const basePath = importPath.startsWith("@/")
     ? importPath.replace("@/", "src/")
-    : path.normalize(path.join(sourceDirectory, importPath));
+    : path.posix.normalize(path.posix.join(sourceDirectory, importPath));
 
   const possibleTargets = [
     basePath,
@@ -113,11 +116,10 @@ function resolveImportToNodeId(
     `${basePath}.tsx`,
     `${basePath}.js`,
     `${basePath}.jsx`,
-    path.join(basePath, "index.ts"),
-    path.join(basePath, "index.tsx"),
-    path.join(basePath, "index.js"),
-    path.join(basePath, "index.jsx"),
+    `${basePath}/index.ts`,
+    `${basePath}/index.tsx`,
+    `${basePath}/index.js`,
+    `${basePath}/index.jsx`,
   ];
-
   return possibleTargets.find((target) => nodeIds.has(target)) ?? null;
 }

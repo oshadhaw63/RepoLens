@@ -22,3 +22,8 @@ export type RepoNodeData = {
 export type RepoNode = Node<RepoNodeData>;
 
 export type RepoEdge = Edge;
+
+export type RepoGraphData={
+  nodes: RepoNode[];
+  edges: RepoEdge[];
+}
