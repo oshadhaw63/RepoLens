@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { GitBranch, Search } from "lucide-react";
+import {createOnboardingPath} from "@/lib/repolens/create-onboarding-path";
 
 import { FileDetailsPanel } from "@/components/file-details-panel";
 import { RepoGraph } from "@/components/repo-graph";
@@ -120,6 +121,10 @@ export function RepoExplorer() {
   };
   }, [graph.nodes, graph.edges]);
 
+  const onboardingPath = useMemo(() => {
+    return createOnboardingPath(graph.nodes);
+  }, [graph.nodes]);
+
   return (
     <main className="min-h-screen bg-stone-100 text-stone-950">
       <header className="border-b border-stone-300 bg-white">
@@ -166,13 +171,38 @@ export function RepoExplorer() {
           )}
         </div>
 
-        {selectedNode ? (
-          <FileDetailsPanel file={selectedNode.data} usedBy={usedBy} />
-        ) : (
-          <aside className="rounded-lg border border-stone-300 bg-white p-5 text-sm text-stone-500">
-            No file selected.
+        <div className="space-y-6">
+          {selectedNode ? (
+            <FileDetailsPanel file={selectedNode.data} usedBy={usedBy} />
+          ) : (
+            <aside className="rounded-lg border border-stone-300 bg-white p-5 text-sm text-stone-500">
+              No file selected.
+            </aside>
+          )}
+
+          <aside className="rounded-lg border border-stone-300 bg-white p-5">
+            <p className="text-sm font-medium text-stone-500">Onboarding path</p>
+            <h2 className="mt-2 text-lg font-semibold">Suggested reading order</h2>
+
+            <ol className="mt-4 space-y-4">
+              {onboardingPath.map((item, index) => (
+                <li key={item.path} className="text-sm">
+                  <div className="flex gap-3">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-teal-700 text-xs font-semibold text-white">
+                      {index + 1}
+                    </span>
+
+                    <div>
+                      <p className="font-medium text-stone-800">{item.label}</p>
+                      <p className="mt-1 text-xs text-stone-500">{item.path}</p>
+                      <p className="mt-2 leading-5 text-stone-700">{item.reason}</p>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ol>
           </aside>
-        )}
+        </div>
       </section>
     </main>
   );
