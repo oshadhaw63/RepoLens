@@ -108,6 +108,18 @@ export function RepoExplorer() {
     setSelectedNode(filteredNodes[0] ?? null);
   }, [filteredNodes, filteredNodeIds, selectedNode]);
 
+  const graphStats = useMemo(() => {
+  return {
+    files: graph.nodes.length,
+    dependencies: graph.edges.length,
+    mediumRiskFiles: graph.nodes.filter(
+      (node) => node.data.risk.level === "medium",
+    ).length,
+    highRiskFiles: graph.nodes.filter((node) => node.data.risk.level === "high")
+      .length,
+  };
+  }, [graph.nodes, graph.edges]);
+
   return (
     <main className="min-h-screen bg-stone-100 text-stone-950">
       <header className="border-b border-stone-300 bg-white">
@@ -116,7 +128,12 @@ export function RepoExplorer() {
             <GitBranch className="h-6 w-6 text-teal-700" />
             <h1 className="text-xl font-semibold">RepoLens</h1>
           </div>
-
+          <div className="hidden items-center gap-3 text-xs text-stone-600 md:flex">
+            <span>{graphStats.files} files</span>
+            <span>{graphStats.dependencies} links</span>
+            <span>{graphStats.mediumRiskFiles} medium risk</span>
+            <span>{graphStats.highRiskFiles} high risk</span>
+          </div>
           <label className="flex w-80 items-center gap-2 rounded-md border border-stone-300 bg-stone-50 px-3 py-2 text-sm">
             <Search className="h-4 w-4 text-stone-500" />
             <input
