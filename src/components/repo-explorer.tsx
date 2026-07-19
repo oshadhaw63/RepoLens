@@ -90,6 +90,16 @@ export function RepoExplorer() {
     });
   }, [graph.edges, filteredNodeIds]);
 
+  const usedBy = useMemo(() => {
+    if (!selectedNode) {
+      return [];
+    }
+
+    return graph.edges
+      .filter((edge) => edge.target === selectedNode.id)
+      .map((edge) => edge.source);
+  }, [graph.edges, selectedNode]);
+
   useEffect(() => {
     if (selectedNode && filteredNodeIds.has(selectedNode.id)) {
       return;
@@ -140,7 +150,7 @@ export function RepoExplorer() {
         </div>
 
         {selectedNode ? (
-          <FileDetailsPanel file={selectedNode.data} />
+          <FileDetailsPanel file={selectedNode.data} usedBy={usedBy} />
         ) : (
           <aside className="rounded-lg border border-stone-300 bg-white p-5 text-sm text-stone-500">
             No file selected.
