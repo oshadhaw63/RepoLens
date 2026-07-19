@@ -73,7 +73,35 @@ function createSummary(file: ParsedTypeScriptFile) {
 }
 
 export function buildGraphFromParsedFiles(files: ParsedTypeScriptFile[]) {
-  const nodes: RepoNode[] = files.map((file, index) => {
+  const folderPaths = Array.from(
+    new Set(files.map((file) => getFolderPath(file.path))),
+  );
+
+  const folderNodes: RepoNode[] = folderPaths.map((folderPath, index) => {
+    return {
+      id: `folder:${folderPath}`,
+      position: {
+        x: (index % 4) * 280,
+        y: Math.floor(index / 4) * 180,
+      },
+      data: {
+        label: folderPath,
+        path: folderPath,
+        kind: "library",
+        summary: "Folder containing related source files.",
+        dependencies: [],
+        imports: [],
+        exports: [],
+        functions: [],
+        risk: {
+          level: "low",
+          reason: "Folder node used for structural navigation.",
+        },
+      },
+    };
+  });
+
+  const fileNodes: RepoNode[] = files.map((file, index) => {
     return {
       id: file.path,
       position: {
@@ -104,7 +132,8 @@ export function buildGraphFromParsedFiles(files: ParsedTypeScriptFile[]) {
   const edges: RepoEdge[] = [];
 
   for (const file of files) {
-    for (const importPath of file.imports) {
+    for (const importSummary of file.imports) {
+      const importPath = getModulePath(importSummary);
       const targetId = resolveImportToNodeId(file.path, importPath, nodeIds);
 
       if (!targetId) {
@@ -160,4 +189,14 @@ function getModulePath(importSummary: string) {
   }
 
   return importSummary.slice(fromIndex + " from ".length);
+}
+
+function getFolderPath(filePath: string) {
+  const folderPath = path.posix.dirname(filePath);
+
+  if (folderPath === ".") {
+    return "root";
+  }
+
+  return folderPath;
 }
