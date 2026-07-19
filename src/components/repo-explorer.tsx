@@ -170,6 +170,15 @@ export function RepoExplorer() {
             <div className="flex h-full items-center justify-center text-sm text-red-600">
               {errorMessage}
             </div>
+          ) : filteredNodes.length === 0 ? (
+            <div className="flex h-full items-center justify-center px-6 text-center">
+              <div>
+                <p className="text-sm font-medium text-stone-700">No matching files</p>
+                <p className="mt-2 text-sm text-stone-500">
+                  Try searching for a file name, function, import, or package.
+                </p>
+              </div>
+            </div>
           ) : (
             <RepoGraph
               nodes={filteredNodes}
