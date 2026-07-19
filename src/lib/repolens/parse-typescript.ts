@@ -30,8 +30,12 @@ export function parseTypeScriptFile(
 
   function visit(node: ts.Node) {
     if (ts.isImportDeclaration(node)) {
-      const moduleName = node.moduleSpecifier.getText(sourceFile).replaceAll('"', "").replaceAll("'", "");
-      result.imports.push(moduleName);
+      const moduleName = node.moduleSpecifier
+        .getText(sourceFile)
+        .replaceAll('"', "")
+        .replaceAll("'", "");
+
+      result.imports.push(createImportSummary(node, moduleName));
     }
 
     if (ts.isFunctionDeclaration(node) && node.name) {
@@ -62,17 +66,17 @@ export function parseTypeScriptFile(
           continue;
         }
 
-          const name = declaration.name.text;
+        const name = declaration.name.text;
 
-          if (declaration.initializer && isFunctionLikeInitializer(declaration.initializer)) {
-            result.functions.push(name);
-          }
+        if (declaration.initializer && isFunctionLikeInitializer(declaration.initializer)) {
+          result.functions.push(name);
+        }
 
-          if (isExported) {
-            result.exports.push(name);
-          }
+        if (isExported) {
+          result.exports.push(name);
         }
       }
+    }
 
     if (ts.isExportAssignment(node)) {
       result.exports.push("default");
@@ -95,10 +99,10 @@ function hasExportKeyword(node: ts.Node) {
 function hasDefaultKeyword(node: ts.Node) {
   return ts.canHaveModifiers(node)
     ? Boolean(
-        node.modifiers?.some(
-          (modifier) => modifier.kind === ts.SyntaxKind.DefaultKeyword,
-        ),
-      )
+      node.modifiers?.some(
+        (modifier) => modifier.kind === ts.SyntaxKind.DefaultKeyword,
+      ),
+    )
     : false;
 }
 
@@ -120,4 +124,36 @@ function getScriptKind(filePath: string) {
 
 function isFunctionLikeInitializer(node: ts.Expression) {
   return ts.isArrowFunction(node) || ts.isFunctionExpression(node);
+}
+
+function createImportSummary(node: ts.ImportDeclaration, moduleName: string) {
+  const importClause = node.importClause;
+
+  if (!importClause) {
+    return moduleName;
+  }
+
+  const importedNames: string[] = [];
+
+  if (importClause.name) {
+    importedNames.push(importClause.name.text);
+  }
+
+  const namedBindings = importClause.namedBindings;
+
+  if (namedBindings && ts.isNamespaceImport(namedBindings)) {
+    importedNames.push(`* as ${namedBindings.name.text}`);
+  }
+
+  if (namedBindings && ts.isNamedImports(namedBindings)) {
+    for (const element of namedBindings.elements) {
+      importedNames.push(element.name.text);
+    }
+  }
+
+  if (importedNames.length === 0) {
+    return moduleName;
+  }
+
+  return `${importedNames.join(", ")} from ${moduleName}`;
 }
