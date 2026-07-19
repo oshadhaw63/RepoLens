@@ -45,7 +45,7 @@ export async function scanRepo(rootDirectory: string) {
         continue;
       }
 
-      const relativePath = path.relative(rootDirectory, fullPath);
+      const relativePath = path.relative(rootDirectory, fullPath).replaceAll(path.sep, "/");
       const content = await readFile(fullPath, "utf-8");
 
       files.push({
