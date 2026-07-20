@@ -92,9 +92,15 @@ export function RepoExplorer() {
     });
   }, [graph.edges, filteredNodeIds]);
 
-  const usedBy = useMemo(() => {
+  const relatedFiles = useMemo(() => {
     if (!selectedNode) {
       return [];
+    }
+
+    if (selectedNode.data.kind === "folder") {
+      return graph.edges
+        .filter((edge) => edge.source === selectedNode.id)
+        .map((edge) => edge.target);
     }
 
     return graph.edges
@@ -229,7 +235,7 @@ export function RepoExplorer() {
             </aside>
           ) : null}
           {selectedNode ? (
-            <FileDetailsPanel file={selectedNode.data} usedBy={usedBy} />
+            <FileDetailsPanel file={selectedNode.data} usedBy={relatedFiles} />
           ) : (
             <aside className="rounded-lg border border-stone-300 bg-white p-5 text-sm text-stone-500">
               No file selected.

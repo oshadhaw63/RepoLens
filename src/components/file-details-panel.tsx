@@ -1,6 +1,7 @@
 import type { RepoNodeData } from "@/lib/repolens/graph-types";
 
 type FileDetailsPanelProps = {
+  
   file: RepoNodeData;
   usedBy: string[];
 };
@@ -12,6 +13,7 @@ const riskStyles = {
 };
 
 export function FileDetailsPanel({ file, usedBy }: FileDetailsPanelProps) {
+  const isFolder = file.kind === "folder";
   return (
     <aside className="rounded-lg border border-stone-300 bg-white p-5">
       <div className="flex items-start justify-between gap-3">
@@ -30,18 +32,34 @@ export function FileDetailsPanel({ file, usedBy }: FileDetailsPanelProps) {
 
       <p className="mt-4 text-sm leading-6 text-stone-700">{file.summary}</p>
 
-      <DetailList title="Dependencies" items={file.dependencies} />
-      <DetailList title="Used by" items={usedBy} emptyText="No files import this file." />
-      <DetailList title="Imports" items={file.imports} />
-      <DetailList title="Exports" items={file.exports} />
-      <DetailList title="Functions" items={file.functions} />
+      {isFolder ? (
+        <DetailList
+          title="Contains"
+          items={usedBy}
+          emptyText="No files shown inside this folder."
+        />
+      ) : (
+        <>
+          <DetailList title="Dependencies" items={file.dependencies} />
+          <DetailList
+            title="Used by"
+            items={usedBy}
+            emptyText="No files import this file."
+          />
+          <DetailList title="Imports" items={file.imports} />
+          <DetailList title="Exports" items={file.exports} />
+          <DetailList title="Functions" items={file.functions} />
+        </>
+      )}
 
-      <div className="mt-6 border-t border-stone-200 pt-4">
-        <p className="text-sm font-medium">Risk note</p>
-        <p className="mt-2 text-sm leading-6 text-stone-700">
-          {file.risk.reason}
-        </p>
-      </div>
+      {!isFolder ? (
+        <div className="mt-6 border-t border-stone-200 pt-4">
+          <p className="text-sm font-medium">Risk note</p>
+          <p className="mt-2 text-sm leading-6 text-stone-700">
+            {file.risk.reason}
+          </p>
+        </div>
+      ) : null}
     </aside>
   );
 }
