@@ -18,6 +18,11 @@ type RepoScanResponse = {
   graph: RepoGraphData;
 };
 
+type ApiHealthResponse = {
+  status: string;
+  service: string;
+};
+
 const emptyGraph: RepoGraphData = {
   nodes: [],
   edges: [],
@@ -53,6 +58,26 @@ export function RepoExplorer() {
     }
 
     loadRepoGraph();
+  }, []);
+
+  useEffect(() => {
+    async function checkApiHealth() {
+      try {
+        const response = await fetch("/api/health");
+
+        if (!response.ok) {
+          throw new Error("Health check failed.");
+        }
+
+        const data = (await response.json()) as ApiHealthResponse;
+
+        setApiStatus(data.status === "ok" ? "ok" : "error");
+      } catch {
+        setApiStatus("error");
+      }
+    }
+
+    checkApiHealth();
   }, []);
 
   const filteredNodes = useMemo(() => {
@@ -141,6 +166,10 @@ export function RepoExplorer() {
     return searchRepo(graph.nodes, searchQuery);
   }, [graph.nodes, searchQuery]);
 
+  const [apiStatus, setApiStatus] = useState<"checking" | "ok" | "error">(
+    "checking",
+  );
+
   return (
     <main className="min-h-screen bg-stone-100 text-stone-950">
       <header className="border-b border-stone-300 bg-white">
@@ -154,6 +183,17 @@ export function RepoExplorer() {
             <span>{graphStats.dependencies} links</span>
             <span>{graphStats.mediumRiskFiles} medium risk</span>
             <span>{graphStats.highRiskFiles} high risk</span>
+            <span
+              className={
+                apiStatus === "ok"
+                  ? "text-emerald-700"
+                  : apiStatus === "error"
+                    ? "text-red-600"
+                    : "text-stone-500"
+              }
+            >
+              API {apiStatus}
+            </span>
           </div>
           <label className="flex w-80 items-center gap-2 rounded-md border border-stone-300 bg-stone-50 px-3 py-2 text-sm">
             <Search className="h-4 w-4 text-stone-500" />
