@@ -207,6 +207,30 @@ export function RepoExplorer() {
         </div>
       </header>
 
+      <section className="border-b border-stone-300 bg-white">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+          <div>
+            <p className="text-sm font-medium text-stone-500">Repository source</p>
+            <h2 className="mt-1 text-base font-semibold">Local RepoLens workspace</h2>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <input
+              className="w-96 rounded-md border border-stone-300 bg-stone-50 px-3 py-2 text-sm outline-none"
+              placeholder="GitHub repo URL support coming next"
+              disabled
+            />
+            <button
+              type="button"
+              className="rounded-md bg-stone-300 px-3 py-2 text-sm font-medium text-stone-600"
+              disabled
+            >
+              Import
+            </button>
+          </div>
+        </div>
+      </section>
+
       <section className="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-6 py-6 lg:grid-cols-[1fr_320px]">
         <div className="h-[620px] overflow-hidden rounded-lg border border-stone-300 bg-white">
           {isLoading ? (
