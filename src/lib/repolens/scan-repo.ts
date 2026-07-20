@@ -14,6 +14,11 @@ const ignoredDirectories = new Set([
   "build",
 ]);
 
+const ignoredFileNames = new Set([
+  "parser-demo.ts",
+  "parser-ddemo.ts",
+]);
+
 const supportedExtensions = new Set([".ts", ".tsx", ".js", ".jsx"]);
 
 export async function scanRepo(rootDirectory: string) {
@@ -39,7 +44,15 @@ export async function scanRepo(rootDirectory: string) {
         continue;
       }
 
+      if (ignoredFileNames.has(entry.name)) {
+        continue;
+      }
+
       const extension = path.extname(entry.name);
+
+      if (entry.name.endsWith(".d.ts")) {
+        continue;
+      }
 
       if (!supportedExtensions.has(extension)) {
         continue;
