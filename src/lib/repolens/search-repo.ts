@@ -24,6 +24,7 @@ export function searchRepo(nodes: RepoNode[], query: string) {
       score += scoreField(node.data.path, normalizedQuery, "path", matches, 4);
       score += scoreField(node.data.summary, normalizedQuery, "summary", matches, 3);
       score += scoreList(node.data.functions, normalizedQuery, "function", matches, 4);
+      score += scoreList(node.data.classes, normalizedQuery, "class", matches, 4);
       score += scoreList(node.data.imports, normalizedQuery, "import", matches, 2);
       score += scoreList(node.data.exports, normalizedQuery, "export", matches, 3);
 

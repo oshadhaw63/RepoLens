@@ -14,6 +14,7 @@ export const sampleNodes: RepoNode[] = [
       imports: ["RepoExplorer from @/components/repo-explorer"],
       exports: ["default Home"],
       functions: ["Home"],
+      classes:[],
       risk: {
         level: "low",
         reason: "Small entry file with one responsibility: render the explorer.",
@@ -42,6 +43,7 @@ export const sampleNodes: RepoNode[] = [
       ],
       exports: ["RepoExplorer"],
       functions: ["RepoExplorer", "filteredNodes search calculation"],
+      classes:[],
       risk: {
         level: "medium",
         reason:
@@ -62,6 +64,7 @@ export const sampleNodes: RepoNode[] = [
       imports: ["React Flow components", "React Flow styles", "Repo graph types"],
       exports: ["RepoGraph"],
       functions: ["RepoGraph"],
+      classes:[],
       risk: {
         level: "medium",
         reason:

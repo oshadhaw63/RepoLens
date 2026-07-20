@@ -93,6 +93,7 @@ export function buildGraphFromParsedFiles(files: ParsedTypeScriptFile[]) {
         imports: [],
         exports: [],
         functions: [],
+        classes:[],
         risk: {
           level: "low",
           reason: "Folder node used for structural navigation.",
@@ -118,13 +119,8 @@ export function buildGraphFromParsedFiles(files: ParsedTypeScriptFile[]) {
         imports: file.imports,
         exports: file.exports,
         functions: file.functions,
-        risk: {
-          level: file.imports.length > 5 ? "medium" : "low",
-          reason:
-            file.imports.length > 5
-              ? "This file imports several modules, so it may coordinate multiple responsibilities."
-              : "This file has a small number of detected imports.",
-        },
+        classes: file.classes,
+        risk: createRisk(file),
       },
     };
   });

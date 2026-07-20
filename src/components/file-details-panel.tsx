@@ -3,7 +3,7 @@ import type { RepoNodeData } from "@/lib/repolens/graph-types";
 type FileDetailsPanelProps = {
   
   file: RepoNodeData;
-  usedBy: string[];
+  relatedFiles: string[];
 };
 
 const riskStyles = {
@@ -12,7 +12,7 @@ const riskStyles = {
   high: "border-red-200 bg-red-50 text-red-700",
 };
 
-export function FileDetailsPanel({ file, usedBy }: FileDetailsPanelProps) {
+export function FileDetailsPanel({ file, relatedFiles }: FileDetailsPanelProps) {
   const isFolder = file.kind === "folder";
   return (
     <aside className="rounded-lg border border-stone-300 bg-white p-5">
@@ -35,20 +35,21 @@ export function FileDetailsPanel({ file, usedBy }: FileDetailsPanelProps) {
       {isFolder ? (
         <DetailList
           title="Contains"
-          items={usedBy}
+          items={relatedFiles}
           emptyText="No files shown inside this folder."
         />
       ) : (
         <>
           <DetailList title="Dependencies" items={file.dependencies} />
           <DetailList
-            title="Used by"
-            items={usedBy}
-            emptyText="No files import this file."
+            title="Related files"
+            items={relatedFiles}
+            emptyText="No related files."
           />
           <DetailList title="Imports" items={file.imports} />
           <DetailList title="Exports" items={file.exports} />
           <DetailList title="Functions" items={file.functions} />
+          <DetailList title="Classes" items={file.classes} />
         </>
       )}
 

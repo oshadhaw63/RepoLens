@@ -74,6 +74,7 @@ export function RepoExplorer() {
         ...node.data.imports,
         ...node.data.exports,
         ...node.data.functions,
+        ...node.data.classes,
       ]
         .join(" ")
         .toLowerCase();
@@ -235,7 +236,7 @@ export function RepoExplorer() {
             </aside>
           ) : null}
           {selectedNode ? (
-            <FileDetailsPanel file={selectedNode.data} usedBy={relatedFiles} />
+            <FileDetailsPanel file={selectedNode.data} relatedFiles={relatedFiles} />
           ) : (
             <aside className="rounded-lg border border-stone-300 bg-white p-5 text-sm text-stone-500">
               No file selected.
