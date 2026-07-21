@@ -169,13 +169,6 @@ export function RepoExplorer() {
       .map((edge) => edge.source);
   }, [graph.edges, selectedNode]);
 
-  useEffect(() => {
-    if (selectedNode && filteredNodeIds.has(selectedNode.id)) {
-      return;
-    }
-
-    setSelectedNode(filteredNodes[0] ?? null);
-  }, [filteredNodes, filteredNodeIds, selectedNode]);
 
   const graphStats = useMemo(() => {
     return {
@@ -270,7 +263,38 @@ export function RepoExplorer() {
                   }`}
                 placeholder="https://github.com/vercel/swr"
                 value={repoUrl}
-                onChange={(event) => setRepoUrl(event.target.value)}
+                onChange={(event) => {
+                  const nextQuery = event.target.value;
+                  setSearchQuery(nextQuery);
+
+                  const query = nextQuery.trim().toLowerCase();
+
+                  if (!query) {
+                    return;
+                  }
+
+                  const nextSelectedNode = graph.nodes.find((node) => {
+                    const searchableText = [
+                      node.data.label,
+                      node.data.path,
+                      node.data.kind,
+                      node.data.summary,
+                      node.data.risk.level,
+                      node.data.risk.reason,
+                      ...node.data.dependencies,
+                      ...node.data.imports,
+                      ...node.data.exports,
+                      ...node.data.functions,
+                      ...node.data.classes,
+                    ]
+                      .join(" ")
+                      .toLowerCase();
+
+                    return searchableText.includes(query);
+                  });
+
+                  setSelectedNode(nextSelectedNode ?? null);
+                }}
               />
 
               <button
