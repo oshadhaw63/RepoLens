@@ -28,6 +28,20 @@ const emptyGraph: RepoGraphData = {
   edges: [],
 };
 
+function isGitHubRepoUrl(value: string) {
+  if (!value.trim()) {
+    return true;
+  }
+
+  try {
+    const url = new URL(value);
+
+    return url.hostname === "github.com" && url.pathname.split("/").filter(Boolean).length >= 2;
+  } catch {
+    return false;
+  }
+}
+
 export function RepoExplorer() {
   const [graph, setGraph] = useState<RepoGraphData>(emptyGraph);
   const [selectedNode, setSelectedNode] = useState<RepoNode | null>(null);
