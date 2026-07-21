@@ -439,6 +439,13 @@ export function RepoExplorer() {
           </aside>
         </div>
       </section>
+
+      <footer className="border-t border-stone-300 bg-white">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 text-xs text-stone-500">
+          <p>RepoLens MVP: JavaScript and TypeScript repository maps.</p>
+          <p>Supports local workspace scans and public GitHub repositories.</p>
+        </div>
+      </footer>
     </main>
   );
 }
