@@ -49,8 +49,9 @@ export function RepoExplorer() {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [repoUrl, setRepoUrl] = useState("");
+  const isRepoUrlValid = isGitHubRepoUrl(repoUrl);
   const [sourceLabel, setSourceLabel] = useState("Local RepoLens workspace");
-
+  const [loadingLabel, setLoadingLabel] = useState("repository graph");
   useEffect(() => {
     loadGraphFromUrl("");
   }, []);
@@ -78,7 +79,7 @@ export function RepoExplorer() {
   async function loadGraphFromUrl(url: string) {
     setIsLoading(true);
     setErrorMessage(null);
-
+    setLoadingLabel(url.trim() ? "GitHub repository graph" : "local repository graph");
     try {
       const endpoint = url.trim()
         ? `/api/github-scan?url=${encodeURIComponent(url.trim())}`
@@ -240,36 +241,52 @@ export function RepoExplorer() {
           </div>
 
           <form
-            className="flex items-center gap-2"
+            className="flex flex-col items-end gap-2"
             onSubmit={(event) => {
               event.preventDefault();
+
+              if (!isRepoUrlValid) {
+                return;
+              }
+
               loadGraphFromUrl(repoUrl);
             }}
           >
-            <input
-              className="w-96 rounded-md border border-stone-300 bg-stone-50 px-3 py-2 text-sm outline-none"
-              placeholder="https://github.com/vercel/swr"
-              value={repoUrl}
-              onChange={(event) => setRepoUrl(event.target.value)}
-            />
-            <button
-              type="submit"
-              className="rounded-md bg-teal-700 px-3 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:bg-stone-300 disabled:text-stone-600"
-              disabled={isLoading}
-            >
-              Import
-            </button>
-            <button
-              type="button"
-              className="rounded-md border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 disabled:text-stone-400"
-              disabled={isLoading}
-              onClick={() => {
-                setRepoUrl("");
-                loadGraphFromUrl("");
-              }}
-            >
-              Local
-            </button>
+            <div className="flex items-center gap-2">
+              <input
+                className={`w-96 rounded-md border bg-stone-50 px-3 py-2 text-sm outline-none ${isRepoUrlValid ? "border-stone-300" : "border-red-400"
+                  }`}
+                placeholder="https://github.com/vercel/swr"
+                value={repoUrl}
+                onChange={(event) => setRepoUrl(event.target.value)}
+              />
+
+              <button
+                type="submit"
+                className="rounded-md bg-teal-700 px-3 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:bg-stone-300 disabled:text-stone-600"
+                disabled={isLoading || !isRepoUrlValid}
+              >
+                Import
+              </button>
+
+              <button
+                type="button"
+                className="rounded-md border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 disabled:text-stone-400"
+                disabled={isLoading}
+                onClick={() => {
+                  setRepoUrl("");
+                  loadGraphFromUrl("");
+                }}
+              >
+                Local
+              </button>
+            </div>
+
+            {isRepoUrlValid ? null : (
+              <p className="text-xs text-red-600">
+                Enter a valid GitHub repository URL.
+              </p>
+            )}
           </form>
         </div>
       </section>
