@@ -16,6 +16,8 @@ import type {
 type RepoScanResponse = {
   fileCount: number;
   graph: RepoGraphData;
+  scanLimit: number;
+  isLimited: boolean;
 };
 
 type ApiHealthResponse = {
@@ -52,6 +54,8 @@ export function RepoExplorer() {
   const isRepoUrlValid = isGitHubRepoUrl(repoUrl);
   const [sourceLabel, setSourceLabel] = useState("Local RepoLens workspace");
   const [loadingLabel, setLoadingLabel] = useState("repository graph");
+  const [scanLimitMessage, setScanLimitMessage] = useState<string | null>(null);
+
   useEffect(() => {
     loadGraphFromUrl("");
   }, []);
@@ -97,6 +101,11 @@ export function RepoExplorer() {
       setGraph(data.graph);
       setSelectedNode(data.graph.nodes[0] ?? null);
       setSourceLabel(url.trim() ? url.trim() : "Local RepoLens workspace");
+      setScanLimitMessage(
+        data.isLimited && data.scanLimit
+          ? `Showing first ${data.scanLimit} supported files for faster GitHub scanning.`
+          : null,
+      );
     } catch (error) {
       setErrorMessage(
         error instanceof Error ? error.message : "Unknown repository import error.",
@@ -295,7 +304,7 @@ export function RepoExplorer() {
         <div className="h-[620px] overflow-hidden rounded-lg border border-stone-300 bg-white">
           {isLoading ? (
             <div className="flex h-full items-center justify-center text-sm text-stone-500">
-              Loading repository graph...
+              Loading {loadingLabel}...
             </div>
           ) : errorMessage ? (
             <div className="flex h-full items-center justify-center text-sm text-red-600">

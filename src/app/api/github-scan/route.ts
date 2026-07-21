@@ -26,6 +26,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       fileCount: parsedFiles.length,
       files: parsedFiles,
+      scanLimit: 80,
+      isLimited: parsedFiles.length === 80,
       graph,
     });
   } catch (error) {
