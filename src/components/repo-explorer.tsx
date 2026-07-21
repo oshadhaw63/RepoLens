@@ -34,30 +34,11 @@ export function RepoExplorer() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [repoUrl, setRepoUrl] = useState("");
+  const [sourceLabel, setSourceLabel] = useState("Local RepoLens workspace");
 
   useEffect(() => {
-    async function loadRepoGraph() {
-      try {
-        const response = await fetch("/api/repo-scan");
-
-        if (!response.ok) {
-          throw new Error("Could not load repo graph.");
-        }
-
-        const data = (await response.json()) as RepoScanResponse;
-
-        setGraph(data.graph);
-        setSelectedNode(data.graph.nodes[0] ?? null);
-      } catch (error) {
-        setErrorMessage(
-          error instanceof Error ? error.message : "Unknown error.",
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    loadRepoGraph();
+    loadGraphFromUrl("");
   }, []);
 
   useEffect(() => {
@@ -79,6 +60,36 @@ export function RepoExplorer() {
 
     checkApiHealth();
   }, []);
+
+  async function loadGraphFromUrl(url: string) {
+    setIsLoading(true);
+    setErrorMessage(null);
+
+    try {
+      const endpoint = url.trim()
+        ? `/api/github-scan?url=${encodeURIComponent(url.trim())}`
+        : "/api/repo-scan";
+
+      const response = await fetch(endpoint);
+
+      if (!response.ok) {
+        const errorData = (await response.json()) as { error?: string };
+        throw new Error(errorData.error ?? "Could not load repository graph.");
+      }
+
+      const data = (await response.json()) as RepoScanResponse;
+
+      setGraph(data.graph);
+      setSelectedNode(data.graph.nodes[0] ?? null);
+      setSourceLabel(url.trim() ? url.trim() : "Local RepoLens workspace");
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error ? error.message : "Unknown repository import error.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   const filteredNodes = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -211,23 +222,41 @@ export function RepoExplorer() {
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
           <div>
             <p className="text-sm font-medium text-stone-500">Repository source</p>
-            <h2 className="mt-1 text-base font-semibold">Local RepoLens workspace</h2>
+            <h2 className="mt-1 text-base font-semibold">{sourceLabel}</h2>
           </div>
 
-          <div className="flex items-center gap-2">
+          <form
+            className="flex items-center gap-2"
+            onSubmit={(event) => {
+              event.preventDefault();
+              loadGraphFromUrl(repoUrl);
+            }}
+          >
             <input
               className="w-96 rounded-md border border-stone-300 bg-stone-50 px-3 py-2 text-sm outline-none"
-              placeholder="GitHub repo URL support coming next"
-              disabled
+              placeholder="https://github.com/vercel/swr"
+              value={repoUrl}
+              onChange={(event) => setRepoUrl(event.target.value)}
             />
             <button
-              type="button"
-              className="rounded-md bg-stone-300 px-3 py-2 text-sm font-medium text-stone-600"
-              disabled
+              type="submit"
+              className="rounded-md bg-teal-700 px-3 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:bg-stone-300 disabled:text-stone-600"
+              disabled={isLoading}
             >
               Import
             </button>
-          </div>
+            <button
+              type="button"
+              className="rounded-md border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 disabled:text-stone-400"
+              disabled={isLoading}
+              onClick={() => {
+                setRepoUrl("");
+                loadGraphFromUrl("");
+              }}
+            >
+              Local
+            </button>
+          </form>
         </div>
       </section>
 
