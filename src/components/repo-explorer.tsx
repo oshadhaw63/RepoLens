@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { GitBranch, Search } from "lucide-react";
+import { GitBranch, HardDrive, RefreshCw, Search, UploadCloud } from "lucide-react";
 import { createOnboardingPath } from "@/lib/repolens/create-onboarding-path";
 import { getExternalDependencies } from "@/lib/repolens/get-external-dependencies"
 import { FileDetailsPanel } from "@/components/file-details-panel";
@@ -275,33 +275,36 @@ export function RepoExplorer() {
 
               <button
                 type="submit"
-                className="rounded-md bg-teal-700 px-3 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:bg-stone-300 disabled:text-stone-600"
+                className="flex items-center gap-2 rounded-md bg-teal-700 px-3 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:bg-stone-300 disabled:text-stone-600"
                 disabled={isLoading || !isRepoUrlValid}
               >
-                Import
+                <UploadCloud className="h-4 w-4" />
+                <span>Import</span>
               </button>
 
               <button
                 type="button"
-                className="rounded-md border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 disabled:text-stone-400"
+                className="flex items-center gap-2 rounded-md border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 disabled:text-stone-400"
                 disabled={isLoading}
                 onClick={() => {
                   setRepoUrl("");
                   loadGraphFromUrl("");
                 }}
               >
-                Local
+                <HardDrive className="h-4 w-4" />
+                <span>Local</span>
               </button>
 
               <button
                 type="button"
-                className="rounded-md border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 disabled:text-stone-400"
+                className="flex items-center gap-2 rounded-md border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 disabled:text-stone-400"
                 disabled={isLoading || !isRepoUrlValid}
                 onClick={() => {
                   loadGraphFromUrl(repoUrl);
                 }}
               >
-                Refresh
+                <RefreshCw className="h-4 w-4" />
+                <span>Refresh</span>
               </button>
             </div>
 
