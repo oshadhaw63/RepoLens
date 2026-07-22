@@ -227,6 +227,38 @@ export function RepoExplorer() {
     return searchRepo(graph.nodes, searchQuery);
   }, [graph.nodes, searchQuery]);
 
+  const riskHotspots = useMemo(() => {
+    const riskWeight = {
+      high: 3,
+      medium: 2,
+      low: 1,
+    } as const;
+
+    return graph.nodes
+      .filter((node) => {
+        return node.data.kind !== "folder" && node.data.risk.level !== "low";
+      })
+      .sort((first, second) => {
+        const firstComplexity =
+          first.data.imports.length +
+          first.data.exports.length +
+          first.data.functions.length +
+          first.data.classes.length;
+        const secondComplexity =
+          second.data.imports.length +
+          second.data.exports.length +
+          second.data.functions.length +
+          second.data.classes.length;
+
+        return (
+          riskWeight[second.data.risk.level] -
+            riskWeight[first.data.risk.level] ||
+          secondComplexity - firstComplexity
+        );
+      })
+      .slice(0, 5);
+  }, [graph.nodes]);
+
   return (
     <main className="flex min-h-screen flex-col bg-slate-50 text-slate-900 lg:h-screen lg:overflow-hidden">
       <header className="sticky top-0 z-20 shrink-0 border-b border-slate-200 bg-white/90 backdrop-blur">
@@ -487,6 +519,49 @@ export function RepoExplorer() {
             </Card>
           )}
 
+          <Card eyebrow="Risk hotspots" title="Files to review">
+            {riskHotspots.length > 0 ? (
+              <ul className="mt-4 space-y-3">
+                {riskHotspots.map((node) => (
+                  <li key={node.id}>
+                    <button
+                      type="button"
+                      className="w-full rounded-lg border border-slate-200 bg-slate-50 p-3 text-left transition hover:border-amber-300 hover:bg-amber-50/70"
+                      onClick={() => setSelectedNode(node)}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="text-sm font-medium text-slate-800">
+                            {node.data.label}
+                          </p>
+                          <p className="mt-1 break-all text-xs text-slate-500">
+                            {node.data.path}
+                          </p>
+                        </div>
+                        <span
+                          className={`shrink-0 rounded-full border px-2 py-0.5 text-xs font-medium capitalize ${
+                            node.data.risk.level === "high"
+                              ? "border-red-200 bg-red-50 text-red-700"
+                              : "border-amber-200 bg-amber-50 text-amber-700"
+                          }`}
+                        >
+                          {node.data.risk.level}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-xs leading-5 text-slate-600">
+                        {node.data.risk.reason}
+                      </p>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-4 text-sm text-slate-500">
+                No medium or high risk files detected.
+              </p>
+            )}
+          </Card>
+
           <Card eyebrow="Onboarding path" title="Suggested reading order">
             <ol className="mt-4 space-y-4">
               {onboardingPath.map((item, index) => (
@@ -592,5 +667,6 @@ function LegendDot({ color, label }: { color: string; label: string }) {
     </span>
   );
 }
+
 
 
