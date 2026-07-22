@@ -4,7 +4,9 @@ export function getExternalDependencies(nodes: RepoNode[]) {
   const packages = new Set<string>();
 
   for (const node of nodes) {
-    for (const importPath of node.data.imports) {
+    for (const importSummary of node.data.imports) {
+      const importPath = getModulePath(importSummary);
+
       if (isExternalImport(importPath)) {
         packages.add(getPackageName(importPath));
       }
@@ -12,6 +14,16 @@ export function getExternalDependencies(nodes: RepoNode[]) {
   }
 
   return Array.from(packages).sort();
+}
+
+function getModulePath(importSummary: string) {
+  const fromIndex = importSummary.lastIndexOf(" from ");
+
+  if (fromIndex === -1) {
+    return importSummary;
+  }
+
+  return importSummary.slice(fromIndex + " from ".length);
 }
 
 function isExternalImport(importPath: string) {

@@ -1,7 +1,7 @@
+import { FileCode2, Folder } from "lucide-react";
 import type { RepoNodeData } from "@/lib/repolens/graph-types";
 
 type FileDetailsPanelProps = {
-  
   file: RepoNodeData;
   relatedFiles: string[];
 };
@@ -12,25 +12,39 @@ const riskStyles = {
   high: "border-red-200 bg-red-50 text-red-700",
 };
 
+const riskDotStyles = {
+  low: "bg-emerald-500",
+  medium: "bg-amber-500",
+  high: "bg-red-500",
+};
+
 export function FileDetailsPanel({ file, relatedFiles }: FileDetailsPanelProps) {
   const isFolder = file.kind === "folder";
   return (
-    <aside className="rounded-lg border border-stone-300 bg-white p-5">
+    <aside className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
       <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-sm font-medium text-stone-500">{file.kind}</p>
-          <h2 className="mt-2 text-lg font-semibold">{file.label}</h2>
-          <p className="mt-1 text-sm text-stone-500">{file.path}</p>
+        <div className="flex items-start gap-3">
+          <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
+            {isFolder ? <Folder className="h-4 w-4" /> : <FileCode2 className="h-4 w-4" />}
+          </span>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+              {file.kind}
+            </p>
+            <h2 className="mt-1 text-lg font-semibold text-slate-900">{file.label}</h2>
+            <p className="mt-1 break-all text-sm text-slate-500">{file.path}</p>
+          </div>
         </div>
 
         <span
-          className={`rounded-md border px-2 py-1 text-xs font-medium capitalize ${riskStyles[file.risk.level]}`}
+          className={`flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium capitalize ${riskStyles[file.risk.level]}`}
         >
+          <span className={`h-1.5 w-1.5 rounded-full ${riskDotStyles[file.risk.level]}`} />
           {file.risk.level} risk
         </span>
       </div>
 
-      <p className="mt-4 text-sm leading-6 text-stone-700">{file.summary}</p>
+      <p className="mt-4 text-sm leading-6 text-slate-600">{file.summary}</p>
 
       {isFolder ? (
         <DetailList
@@ -54,9 +68,9 @@ export function FileDetailsPanel({ file, relatedFiles }: FileDetailsPanelProps) 
       )}
 
       {!isFolder ? (
-        <div className="mt-6 border-t border-stone-200 pt-4">
-          <p className="text-sm font-medium">Risk note</p>
-          <p className="mt-2 text-sm leading-6 text-stone-700">
+        <div className="mt-6 border-t border-slate-200 pt-4">
+          <p className="text-sm font-medium text-slate-800">Risk note</p>
+          <p className="mt-2 text-sm leading-6 text-slate-600">
             {file.risk.reason}
           </p>
         </div>
@@ -73,17 +87,19 @@ type DetailListProps = {
 
 function DetailList({ title, items, emptyText = "None detected." }: DetailListProps) {
   return (
-    <div className="mt-6 border-t border-stone-200 pt-4">
-      <p className="text-sm font-medium">{title}</p>
+    <div className="mt-6 border-t border-slate-200 pt-4">
+      <p className="text-sm font-medium text-slate-800">{title}</p>
 
       {items.length > 0 ? (
-        <ul className="mt-3 space-y-2 text-sm text-stone-700">
+        <ul className="mt-3 space-y-1.5 text-sm text-slate-600">
           {items.map((item) => (
-            <li key={item}>{item}</li>
+            <li key={item} className="rounded-md bg-slate-50 px-2.5 py-1.5 font-mono text-xs text-slate-700">
+              {item}
+            </li>
           ))}
         </ul>
       ) : (
-        <p className="mt-3 text-sm text-stone-500">{emptyText}</p>
+        <p className="mt-3 text-sm text-slate-500">{emptyText}</p>
       )}
     </div>
   );

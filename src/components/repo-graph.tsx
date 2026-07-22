@@ -1,9 +1,12 @@
 "use client";
 
-import { Background, Controls, MiniMap, ReactFlow } from "@xyflow/react";
+import { useEffect, useRef } from "react";
+import { Background, Controls, ReactFlow } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
 import type { RepoEdge, RepoNode } from "@/lib/repolens/graph-types";
+
+const FIT_VIEW_OPTIONS = { padding: 0.25, maxZoom: 1.1 };
 
 type RepoGraphProps = {
   nodes: RepoNode[];
@@ -18,6 +21,25 @@ export function RepoGraph({
   selectedNodeId,
   onNodeSelect,
 }: RepoGraphProps) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const fitViewRef = useRef<(() => void) | null>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+
+    if (!container) {
+      return;
+    }
+
+    const observer = new ResizeObserver(() => {
+      fitViewRef.current?.();
+    });
+
+    observer.observe(container);
+
+    return () => observer.disconnect();
+  }, []);
+
   const connectedNodeIds = new Set<string>();
 
   for (const edge of edges) {
@@ -39,15 +61,18 @@ export function RepoGraph({
       ...node,
       selected: isSelected,
       style: {
+        borderRadius: 8,
+        boxShadow: isSelected ? "0 0 0 3px rgba(79, 70, 229, 0.15)" : "none",
         border: isSelected
-          ? "2px solid #0f766e"
+          ? "2px solid #4f46e5"
           : isConnected
-            ? "2px solid #14b8a6"
+            ? "2px solid #818cf8"
             : isFolder
               ? "1px solid #f59e0b"
               : "1px solid #d6d3d1",
-        background: isSelected ? "#ccfbf1" : isFolder ? "#fffbeb" : "#ffffff",
-        color: "#1c1917",
+        background: isSelected ? "#eef2ff" : isFolder ? "#fffbeb" : "#ffffff",
+        color: "#0f172a",
+        fontWeight: isSelected ? 600 : 500,
       },
     };
   });
@@ -60,22 +85,28 @@ export function RepoGraph({
       ...edge,
       animated: isConnected,
       style: {
-        stroke: isConnected ? "#0f766e" : "#a8a29e",
+        stroke: isConnected ? "#4f46e5" : "#cbd5e1",
         strokeWidth: isConnected ? 2 : 1,
       },
     };
   });
 
   return (
-    <ReactFlow
-      nodes={visibleNodes}
-      edges={visibleEdges}
-      fitView
-      onNodeClick={(_, node) => onNodeSelect(node as RepoNode)}
-    >
-      <Background />
-      <Controls />
-      <MiniMap />
-    </ReactFlow>
+    <div ref={containerRef} className="h-full w-full">
+      <ReactFlow
+        nodes={visibleNodes}
+        edges={visibleEdges}
+        fitView
+        fitViewOptions={FIT_VIEW_OPTIONS}
+        minZoom={0.2}
+        onInit={(instance) => {
+          fitViewRef.current = () => instance.fitView(FIT_VIEW_OPTIONS);
+        }}
+        onNodeClick={(_, node) => onNodeSelect(node as RepoNode)}
+      >
+        <Background color="#cbd5e1" gap={20} />
+        <Controls className="!shadow-md" />
+      </ReactFlow>
+    </div>
   );
 }
